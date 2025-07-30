@@ -1,0 +1,1 @@
+curl -X POST -H "Content-Type: application/json" -d '{"product_name": "test_product", "product_description": "A fun little charm!", "price": "5", "in_stock": "true"}' https://localhost:8080/admin/item/create

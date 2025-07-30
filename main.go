@@ -1,0 +1,65 @@
+package main
+
+import (
+	"database/sql"
+	"html/template"
+	"log"
+	"net/http"
+	"os"
+
+	_ "github.com/lib/pq"
+	"github.com/lpernett/godotenv"
+	"github.com/tristenkelly/the-trinity-pallette/internal/database"
+)
+
+type apiConfig struct {
+	s3bucket     string
+	filepath_dir string
+	db           *database.Queries
+}
+
+func main() {
+	godotenv.Load(".env")
+	dbURL := os.Getenv("DB_URL")
+	db, err := sql.Open("postgres", dbURL)
+	dbQueries := database.New(db)
+
+	if err != nil {
+		log.Printf("error getting database url: %v", err)
+	}
+
+	mux := http.NewServeMux()
+	server := http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
+
+	cfg := apiConfig{
+		db: dbQueries,
+	}
+
+	fs := http.FileServer(http.Dir("./static"))
+	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		renderTemplate(w, "index.html")
+	})
+
+	mux.HandleFunc("/shop", shopHandler)
+	mux.HandleFunc("/admin/item/create", cfg.createItem)
+	mux.HandleFunc("/admin/reset", cfg.resetItems)
+
+	mux.HandleFunc("/api/items", cfg.itemsToServe)
+	log.Println("Server running on http://localhost:8080")
+	http.ListenAndServe(server.Addr, server.Handler)
+}
+
+func renderTemplate(w http.ResponseWriter, filename string) {
+	tmpl, err := template.ParseFiles("templates/" + filename)
+	if err != nil {
+		http.Error(w, "Page not found", 500)
+		log.Println("Template error:", err)
+		return
+	}
+	tmpl.Execute(w, nil)
+}
