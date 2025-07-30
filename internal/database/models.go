@@ -17,4 +17,23 @@ type Item struct {
 	Price              int32
 	InStock            bool
 	UpdatedAt          time.Time
+	ProductImage       string
+}
+
+type Post struct {
+	ID        int32
+	Title     string
+	Body      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    uuid.UUID
+}
+
+type User struct {
+	ID             uuid.UUID
+	Username       string
+	Email          string
+	HashedPassword string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }

@@ -22,7 +22,7 @@ VALUES (
     $5,
     $6
 )
-RETURNING id, product_name, product_description, price, in_stock, updated_at
+RETURNING id, product_name, product_description, price, in_stock, updated_at, product_image
 `
 
 type CreateItemParams struct {
@@ -51,6 +51,7 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 		&i.Price,
 		&i.InStock,
 		&i.UpdatedAt,
+		&i.ProductImage,
 	)
 	return i, err
 }
