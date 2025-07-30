@@ -45,9 +45,14 @@ func main() {
 		renderTemplate(w, "index.html")
 	})
 
-	mux.HandleFunc("/shop", shopHandler)
-	mux.HandleFunc("/admin/item/create", cfg.createItem)
-	mux.HandleFunc("/admin/reset", cfg.resetItems)
+	mux.HandleFunc("GET /login", func(w http.ResponseWriter, r *http.Request) {
+		renderTemplate(w, "login.html")
+	})
+
+	mux.HandleFunc("GET /shop", shopHandler)
+	mux.HandleFunc("POST /admin/item/create", cfg.createItem)
+	mux.HandleFunc("POST /admin/reset", cfg.resetItems)
+	mux.HandleFunc("GET /blog", cfg.blogHandler)
 
 	mux.HandleFunc("/api/items", cfg.itemsToServe)
 	log.Println("Server running on http://localhost:8080")
