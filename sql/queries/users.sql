@@ -32,3 +32,8 @@ WHERE email = $1;
 UPDATE users
 SET email = $2
 WHERE username = $1;
+
+-- name: isAdmin :one
+SELECT is_admin
+FROM users
+WHERE id = $1;

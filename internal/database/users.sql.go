@@ -150,3 +150,16 @@ func (q *Queries) GetUserByName(ctx context.Context, username string) (User, err
 	)
 	return i, err
 }
+
+const isAdmin = `-- name: isAdmin :one
+SELECT is_admin
+FROM users
+WHERE id = $1
+`
+
+func (q *Queries) isAdmin(ctx context.Context, id uuid.UUID) (bool, error) {
+	row := q.db.QueryRowContext(ctx, isAdmin, id)
+	var is_admin bool
+	err := row.Scan(&is_admin)
+	return is_admin, err
+}

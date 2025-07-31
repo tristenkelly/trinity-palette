@@ -60,12 +60,15 @@ func main() {
 		renderTemplate(w, "changepass.html")
 	})
 
+	mux.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
+		renderTemplate(w, "admin.html")
+	})
+
 	mux.HandleFunc("GET /shop", shopHandler)
 	mux.HandleFunc("POST /admin/item/create", cfg.createItem)
 	mux.HandleFunc("POST /admin/reset", cfg.resetItems)
 	mux.HandleFunc("GET /blog", cfg.blogHandler)
 	mux.HandleFunc("POST /admin/blog/create", cfg.createPost)
-	mux.HandleFunc("GET /admin", cfg.adminPageHandler)
 	mux.HandleFunc("/api/posts", cfg.postsToServe)
 	mux.HandleFunc("/api/items", cfg.itemsToServe)
 	mux.HandleFunc("/api/login", cfg.handleLogin)
@@ -75,6 +78,7 @@ func main() {
 	mux.HandleFunc("/api/changepassword", cfg.changePassword)
 	mux.HandleFunc("/api/changeemail", cfg.changeEmail)
 	mux.HandleFunc("/api/verify", cfg.handleVerifyToken)
+	mux.HandleFunc("/api/userInfo", cfg.userInfo)
 	log.Println("Server running on http://localhost:8080")
 	http.ListenAndServe(server.Addr, server.Handler)
 }

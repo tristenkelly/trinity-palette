@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -34,7 +33,7 @@ func CheckPasswordHash(password, hash string) error {
 }
 
 func MakeJWT(userID uuid.UUID, tokenSecret string) (string, error) {
-	hmacSecret := []byte(os.Getenv("JWT-SECRET"))
+	hmacSecret := []byte(tokenSecret)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
 		Issuer:    "Trinity-Palette",
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -50,7 +49,7 @@ func MakeJWT(userID uuid.UUID, tokenSecret string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateJWT(tokenString, tokenSecret string) (uuid.UUID, error) {
+func ValidateJWT(tokenString string, tokenSecret string) (uuid.UUID, error) {
 	claims := &jwt.RegisteredClaims{}
 	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(tokenSecret), nil

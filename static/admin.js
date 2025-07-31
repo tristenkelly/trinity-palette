@@ -1,4 +1,29 @@
 // Submit Blog Post
+document.addEventListener('DOMContentLoaded', async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('You must be logged in to access admin features.');
+    window.location.href = '/login';
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/userInfo', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) throw new Error('Not authorized');
+
+    const user = await res.json();
+
+    if (user.is_admin !== true) {
+      alert('You do not have permission to access this page.');
+      window.location.href = '/';
+      return;
+    }
+
 document.getElementById('post-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const title = document.getElementById('post-title').value;
@@ -75,6 +100,12 @@ async function deleteItem(id) {
     alert('Failed to delete item.');
   }
 }
+
+  } catch (err) {
+    console.error('Auth check failed:', err);
+    window.location.href = '/login';
+  }
+});
 
 // Load items on start
 fetchItems();

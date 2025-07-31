@@ -1,8 +1,8 @@
 :root {
-  --main-pink: #ffb6c1;
+  --main-pink: #db7181;
   --accent-pink: #ffc0cb;
   --soft-yellow: #fff8dc;
-  --lavender: #e6e6fa;
+  --lavender: #c280d3;
   --white: #fff;
 }
 
@@ -28,6 +28,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow added */
 }
 
 .navbar {
@@ -205,64 +206,150 @@ body {
   padding: 2rem;
 }
 
-/* HOME PAGE SPECIFIC */
+/* Make sure hero-wrapper is relative for sparkles absolute positioning */
+.hero-wrapper {
+  position: relative; /* Needed so sparkles use this as reference */
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  background-color: #fff0f5;
+  border-radius: 30px;
+  box-shadow: 0 8px 24px rgba(255, 182, 193, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-height: 500px; /* Make space for sparkles to move */
+}
+
+
+/* The main container holding text and buttons */
+.home-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Style the main title */
+.home-container h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 3rem;
+  color: var(--main-pink);
+  margin-bottom: 0.2rem;
+}
+
+/* Paragraph styling */
+.home-container p {
+  font-size: 1.2rem;
+  color: #5a4e4e;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+/* Group buttons side by side with spacing */
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Ensure buttons stay nicely sized */
+.btn-group .btn {
+  min-width: 140px;
+}
+
 .home-page {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 80px); /* adjust for navbar height */
-  background-color: #ffeef6;
+  min-height: calc(100vh - 80px); /* navbar height */
+  background-color: #f2d2ff; /* match your desired bg */
+  padding: 1rem;
+  flex-direction: column;
 }
 
-.hero-card {
-  background: #fff;
-  padding: 3rem 4rem;
-  border-radius: 30px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  text-align: center;
-  max-width: 600px;
-}
-
-.hero-card h1 {
-  font-size: 2.2rem;
-  color: #5a4e4e;
-  margin-bottom: 1rem;
-}
-
-.hero-card p {
-  font-size: 1.1rem;
-  color: #777;
-  margin-bottom: 2rem;
-}
-
-.hero-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
+.page-content {
+  background-color: #f2d2ff; /* match home-page to prevent contrast */
 }
 
 .sparkles {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .sparkle {
   position: absolute;
-  width: 8px;
-  height: 8px;
-  background-color: #ffc9e3;
+  width: 6px;
+  height: 6px;
+  background: #ffc9e3;
   border-radius: 50%;
-  opacity: 0.8;
-  animation: sparkle-float 6s infinite ease-in-out;
+  opacity: 0;
+  box-shadow: 0 0 6px 2px rgba(255, 201, 227, 0.5); /* subtle glow */
+  animation: sparkle-float 6s ease-in-out infinite, sparkle-glow 2s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 @keyframes sparkle-float {
-  0%   { transform: translateY(0); opacity: 1; }
-  50%  { opacity: 0.5; }
-  100% { transform: translateY(-20px); opacity: 1; }
+  0% {
+    transform: translate(0px, 0px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+}
+
+
+@keyframes sparkle-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px 2px rgba(255, 201, 227, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 10px 3px rgba(255, 201, 227, 0.6);
+  }
+}
+
+#admin-button {
+  display: none; /* show it dynamically via JS */
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #db7181, #ffc0cb);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(219, 113, 129, 0.4);
+  text-decoration: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+}
+
+#admin-button:hover {
+  background: linear-gradient(135deg, #ffc0cb, #db7181);
+  box-shadow: 0 6px 10px rgba(255, 192, 203, 0.6);
+}
+
+#admin-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #ffc0cb;
 }
