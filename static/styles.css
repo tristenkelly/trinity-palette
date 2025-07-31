@@ -322,3 +322,9 @@ body {
 .login-form button:hover {
   background-color: #ff1493;
 }
+
+.login-underbox {
+  color: #c71585;
+  margin-bottom: 1rem;
+  font-weight: 300;
+}

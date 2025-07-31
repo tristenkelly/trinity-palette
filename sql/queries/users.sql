@@ -14,3 +14,7 @@ RETURNING *;
 -- name: GetUser :exec
 SELECT * FROM users
 WHERE id = $1;
+
+-- name: GetPassHash :one
+SELECT * from users
+WHERE email = $1;
