@@ -54,14 +54,14 @@ func (cfg *apiConfig) createPost(w http.ResponseWriter, r *http.Request) {
 		Title     string    `json:"title"`
 		Body      string    `json:"body"`
 		CreatedAt time.Time `json:"created_at"`
-		userID    uuid.UUID `json:"user_id"`
+		UserID    uuid.UUID `json:"user_id"`
 	}
 
 	returnPostResults := returnPost{
 		Title:     post.Title,
 		Body:      post.Body,
 		CreatedAt: post.CreatedAt,
-		userID:    post.UserID,
+		UserID:    post.UserID,
 	}
 
 	val, err := json.Marshal(returnPostResults)

@@ -48,11 +48,11 @@ func main() {
 		renderTemplate(w, "index.html")
 	})
 
-	mux.HandleFunc("GET /login", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "login.html")
 	})
 
-	mux.HandleFunc("GET /register", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "register.html")
 	})
 
@@ -63,7 +63,10 @@ func main() {
 	mux.HandleFunc("POST /admin/blog/create", cfg.createPost)
 	mux.HandleFunc("/api/posts", cfg.postsToServe)
 	mux.HandleFunc("/api/items", cfg.itemsToServe)
-	mux.HandleFunc("api/login", cfg.handleLogin)
+	mux.HandleFunc("/api/login", cfg.handleLogin)
+	mux.HandleFunc("/api/register", cfg.signUpHandler)
+	mux.HandleFunc("api/getrt", cfg.getRefreshToken)
+	mux.HandleFunc("POST admin/revoketoken", cfg.revokeRefreshToken)
 	log.Println("Server running on http://localhost:8080")
 	http.ListenAndServe(server.Addr, server.Handler)
 }

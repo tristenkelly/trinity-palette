@@ -20,6 +20,7 @@ func (cfg *apiConfig) signUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	decoder := json.NewDecoder(r.Body)
 	params := userParams{}
+	log.Println(params)
 	err := decoder.Decode(&params)
 	if err != nil {
 		log.Printf("error decoding user data %v", err)
@@ -48,16 +49,25 @@ func (cfg *apiConfig) signUpHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, err := cfg.db.CreateUser(r.Context(), queryParams)
 
+	token, err := auth.MakeJWT(user.ID, cfg.jwtsecret)
+	if err != nil {
+		log.Printf("error making jwt: %v", err)
+		w.WriteHeader(500)
+		return
+	}
+
 	type returnUser struct {
 		Username  string    `json:"username"`
 		Email     string    `json:"email"`
 		CreatedAt time.Time `json:"created_at"`
+		Token     string    `json:"token"`
 	}
 
 	returnUserInfo := returnUser{
 		Username:  user.Username,
 		Email:     user.Email,
 		CreatedAt: user.CreatedAt,
+		Token:     token,
 	}
 
 	val, err := json.Marshal(returnUserInfo)
