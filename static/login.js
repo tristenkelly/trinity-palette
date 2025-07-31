@@ -1,4 +1,3 @@
-const loginForm = document.getElementById('login-form');
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("login-form");
 
@@ -24,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('refresh_token', data.refresh_token);
       alert('Logged in successfully!');
-      window.location.href = '/'; // or redirect to dashboard/homepage
+      window.location.href = '/blog';
     } else if (res.status === 401) {
       alert('Incorrect email or password.');
     } else {

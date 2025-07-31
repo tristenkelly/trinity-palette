@@ -56,23 +56,31 @@ func main() {
 		renderTemplate(w, "register.html")
 	})
 
+	mux.HandleFunc("/forgotpassword", func(w http.ResponseWriter, r *http.Request) {
+		renderTemplate(w, "changepass.html")
+	})
+
 	mux.HandleFunc("GET /shop", shopHandler)
 	mux.HandleFunc("POST /admin/item/create", cfg.createItem)
 	mux.HandleFunc("POST /admin/reset", cfg.resetItems)
 	mux.HandleFunc("GET /blog", cfg.blogHandler)
 	mux.HandleFunc("POST /admin/blog/create", cfg.createPost)
+	mux.HandleFunc("GET /admin", cfg.adminPageHandler)
 	mux.HandleFunc("/api/posts", cfg.postsToServe)
 	mux.HandleFunc("/api/items", cfg.itemsToServe)
 	mux.HandleFunc("/api/login", cfg.handleLogin)
 	mux.HandleFunc("/api/register", cfg.signUpHandler)
 	mux.HandleFunc("api/getrt", cfg.getRefreshToken)
 	mux.HandleFunc("POST admin/revoketoken", cfg.revokeRefreshToken)
+	mux.HandleFunc("/api/changepassword", cfg.changePassword)
+	mux.HandleFunc("/api/changeemail", cfg.changeEmail)
+	mux.HandleFunc("/api/verify", cfg.handleVerifyToken)
 	log.Println("Server running on http://localhost:8080")
 	http.ListenAndServe(server.Addr, server.Handler)
 }
 
 func renderTemplate(w http.ResponseWriter, filename string) {
-	tmpl, err := template.ParseFiles("templates/" + filename)
+	tmpl, err := template.ParseFiles("templates/"+filename, "templates/navbar.html")
 	if err != nil {
 		http.Error(w, "Page not found", 500)
 		log.Println("Template error:", err)

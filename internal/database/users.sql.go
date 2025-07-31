@@ -12,6 +12,38 @@ import (
 	"github.com/google/uuid"
 )
 
+const changeEmail = `-- name: ChangeEmail :exec
+UPDATE users
+SET email = $2
+WHERE username = $1
+`
+
+type ChangeEmailParams struct {
+	Username string
+	Email    string
+}
+
+func (q *Queries) ChangeEmail(ctx context.Context, arg ChangeEmailParams) error {
+	_, err := q.db.ExecContext(ctx, changeEmail, arg.Username, arg.Email)
+	return err
+}
+
+const changePass = `-- name: ChangePass :exec
+UPDATE users
+SET hashed_password = $2
+WHERE email = $1
+`
+
+type ChangePassParams struct {
+	Email          string
+	HashedPassword string
+}
+
+func (q *Queries) ChangePass(ctx context.Context, arg ChangePassParams) error {
+	_, err := q.db.ExecContext(ctx, changePass, arg.Email, arg.HashedPassword)
+	return err
+}
+
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id, username, email, hashed_password, created_at, updated_at, is_admin)
 VALUES (
@@ -79,12 +111,42 @@ func (q *Queries) GetPassHash(ctx context.Context, email string) (User, error) {
 	return i, err
 }
 
-const getUser = `-- name: GetUser :exec
+const getUser = `-- name: GetUser :one
 SELECT id, username, email, hashed_password, created_at, updated_at, is_admin FROM users
 WHERE id = $1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) error {
-	_, err := q.db.ExecContext(ctx, getUser, id)
-	return err
+func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUser, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.HashedPassword,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.IsAdmin,
+	)
+	return i, err
+}
+
+const getUserByName = `-- name: GetUserByName :one
+SELECT id, username, email, hashed_password, created_at, updated_at, is_admin FROM users
+WHERE username = $1
+`
+
+func (q *Queries) GetUserByName(ctx context.Context, username string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByName, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.HashedPassword,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.IsAdmin,
+	)
+	return i, err
 }

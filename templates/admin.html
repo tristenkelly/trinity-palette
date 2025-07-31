@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="/static/admin.css" />
+</head>
+<body>
+    {{ template "navbar" }}
+<header>
+  <h1>Admin Dashboard</h1>
+</header>
+<div class="page-content">
+<div class="container">
+  <!-- Create Blog Post -->
+  <form id="post-form">
+    <h2>Create Blog Post</h2>
+    <input type="text" id="post-title" placeholder="Post Title" required />
+    <textarea id="post-body" placeholder="Post Body" rows="6" required></textarea>
+    <button type="submit">Publish Post</button>
+  </form>
+
+  <!-- Create Shop Item -->
+  <form id="item-form" enctype="multipart/form-data">
+    <h2>Create Shop Item</h2>
+    <input type="text" id="item-name" placeholder="Item Name" required />
+    <input type="file" id="item-image" accept="image/*" required />
+    <button type="submit">Add Item</button>
+  </form>
+
+  <!-- Delete Section -->
+  <div class="delete-section">
+    <h2>Delete Items/Images</h2>
+    <button onclick="fetchItems()">Refresh Items</button>
+    <div class="item-list" id="item-list"></div>
+  </div>
+</div>
+</div>
+
+<script src="/static/admin.js"></script>
+</body>
+</html>

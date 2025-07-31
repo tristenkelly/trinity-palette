@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
+  {{ template "navbar" }}
+  <div class="page-content">
   <div class="container">
     <h1>Our Gallery</h1>
     <p>Check out our beautiful art pieces!</p>
@@ -18,7 +20,9 @@
       <!-- JS will insert items here -->
     </div>
   </div>
+</div>
 
   <script src="/static/shop.js"></script>
+  <script src="/static/auth.js"></script>
 </body>
 </html>

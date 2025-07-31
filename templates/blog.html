@@ -8,10 +8,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
+  {{ template "navbar" }}
+  <div class="page-content">
   <div class="blog-container">
-        <div class="top-nav">
-        <a href="/login" class="login-button">Login</a>
-    </div>
     <h1 class="blog-title">The Trinity Blog</h1>
     <p class="blog-subtitle">Thoughts, updates & how things are going 💕</p>
 
@@ -24,6 +23,8 @@
       <!-- Loop more blog posts here from database -->
     </div>
   </div>
+  </div>
   <script src="/static/blog.js"></script>
+  <script src="/static/auth.js"></script>
 </body>
 </html>
