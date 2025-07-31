@@ -1,0 +1,72 @@
+package main
+
+import (
+	"encoding/json"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/tristenkelly/the-trinity-pallette/internal/auth"
+	"github.com/tristenkelly/the-trinity-pallette/internal/database"
+)
+
+func (cfg *apiConfig) signUpHandler(w http.ResponseWriter, r *http.Request) {
+	type userParams struct {
+		Email    string `json:"email"`
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	params := userParams{}
+	err := decoder.Decode(&params)
+	if err != nil {
+		log.Printf("error decoding user data %v", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	hashedPass, err := auth.HashPassword(params.Password)
+	if err != nil {
+		log.Printf("couldn't hash password: %v", err)
+		w.WriteHeader(500)
+		return
+	}
+
+	userID := uuid.New()
+
+	queryParams := database.CreateUserParams{
+		ID:             userID,
+		Username:       params.Username,
+		Email:          params.Email,
+		HashedPassword: hashedPass,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+		IsAdmin:        false,
+	}
+
+	user, err := cfg.db.CreateUser(r.Context(), queryParams)
+
+	type returnUser struct {
+		Username  string    `json:"username"`
+		Email     string    `json:"email"`
+		CreatedAt time.Time `json:"created_at"`
+	}
+
+	returnUserInfo := returnUser{
+		Username:  user.Username,
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+	}
+
+	val, err := json.Marshal(returnUserInfo)
+	if err != nil {
+		log.Printf("couldn't return user data: %v", err)
+		w.WriteHeader(500)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	w.Write(val)
+}

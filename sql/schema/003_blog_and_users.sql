@@ -5,7 +5,8 @@ CREATE TABLE users(
     email TEXT NOT NULL,
     hashed_password TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    updated_at TIMESTAMP NOT NULL,
+    is_admin BOOLEAN NOT NULL
 );
 
 

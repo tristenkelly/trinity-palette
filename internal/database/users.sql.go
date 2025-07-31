@@ -13,16 +13,17 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (id, username, email, hashed_password, created_at, updated_at)
+INSERT INTO users (id, username, email, hashed_password, created_at, updated_at, is_admin)
 VALUES (
     $1,
     $2,
     $3,
     $4,
     $5,
-    $6
+    $6,
+    $7
 )
-RETURNING id, username, email, hashed_password, created_at, updated_at
+RETURNING id, username, email, hashed_password, created_at, updated_at, is_admin
 `
 
 type CreateUserParams struct {
@@ -32,6 +33,7 @@ type CreateUserParams struct {
 	HashedPassword string
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
+	IsAdmin        bool
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
@@ -42,6 +44,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.HashedPassword,
 		arg.CreatedAt,
 		arg.UpdatedAt,
+		arg.IsAdmin,
 	)
 	var i User
 	err := row.Scan(
@@ -51,12 +54,13 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.HashedPassword,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.IsAdmin,
 	)
 	return i, err
 }
 
 const getUser = `-- name: GetUser :exec
-SELECT id, username, email, hashed_password, created_at, updated_at FROM users
+SELECT id, username, email, hashed_password, created_at, updated_at, is_admin FROM users
 WHERE id = $1
 `
 
