@@ -92,6 +92,7 @@ func main() {
 	r.HandleFunc("/api/verify", cfg.handleVerifyToken)
 	r.HandleFunc("/api/userInfo", cfg.userInfo)
 	r.Delete("/api/item/{itemID}", cfg.deleteItem)
+	r.Delete("/api/post/{postID}", cfg.deletePost)
 	log.Println("Server running on http://localhost:8080")
 	http.ListenAndServe(server.Addr, server.Handler)
 }

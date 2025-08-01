@@ -10,8 +10,12 @@ VALUES (
 RETURNING *;
 
 -- name: GetPosts :many
-SELECT posts.title, posts.body, posts.created_at, posts.updated_at, users.username
+SELECT posts.id, posts.title, posts.body, posts.created_at, posts.updated_at, users.username
 FROM posts
 INNER JOIN users ON posts.user_id = users.id
 ORDER BY posts.created_at ASC
 LIMIT 10;
+
+-- name: DeletePost :exec
+DELETE FROM posts
+WHERE id = $1;

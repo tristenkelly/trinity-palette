@@ -9,7 +9,6 @@ import (
 )
 
 func (cfg *apiConfig) deleteItem(w http.ResponseWriter, r *http.Request) {
-	log.Printf("deleting item")
 	ItemIDStr := chi.URLParam(r, "itemID")
 	itemID, err := uuid.Parse(ItemIDStr)
 	if err != nil {
@@ -17,8 +16,6 @@ func (cfg *apiConfig) deleteItem(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	log.Printf("Deleting item with ID: %s", itemID)
 
 	err2 := cfg.db.DeleteItem(r.Context(), itemID)
 	if err2 != nil {

@@ -52,8 +52,18 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 	return i, err
 }
 
+const deletePost = `-- name: DeletePost :exec
+DELETE FROM posts
+WHERE id = $1
+`
+
+func (q *Queries) DeletePost(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, deletePost, id)
+	return err
+}
+
 const getPosts = `-- name: GetPosts :many
-SELECT posts.title, posts.body, posts.created_at, posts.updated_at, users.username
+SELECT posts.id, posts.title, posts.body, posts.created_at, posts.updated_at, users.username
 FROM posts
 INNER JOIN users ON posts.user_id = users.id
 ORDER BY posts.created_at ASC
@@ -61,6 +71,7 @@ LIMIT 10
 `
 
 type GetPostsRow struct {
+	ID        int32
 	Title     string
 	Body      string
 	CreatedAt time.Time
@@ -78,6 +89,7 @@ func (q *Queries) GetPosts(ctx context.Context) ([]GetPostsRow, error) {
 	for rows.Next() {
 		var i GetPostsRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Title,
 			&i.Body,
 			&i.CreatedAt,

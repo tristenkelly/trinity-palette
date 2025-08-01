@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) itemsToServe(w http.ResponseWriter, r *http.Request) {
@@ -15,16 +17,18 @@ func (cfg *apiConfig) itemsToServe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type ItemResponse struct {
-		ProductName        string `json:"product_name"`
-		ProductDescription string `json:"product_description"`
-		Price              int32  `json:"price"`
-		InStock            bool   `json:"in_stock"`
-		Image_url          string `json:"image_url"`
+		Id                 uuid.UUID `json:"id"`
+		ProductName        string    `json:"product_name"`
+		ProductDescription string    `json:"product_description"`
+		Price              int32     `json:"price"`
+		InStock            bool      `json:"in_stock"`
+		Image_url          string    `json:"image_url"`
 	}
 
 	var responseItems []ItemResponse
 	for _, item := range items {
 		responseItems = append(responseItems, ItemResponse{
+			Id:                 item.ID,
 			ProductName:        item.ProductName,
 			ProductDescription: item.ProductDescription,
 			Price:              item.Price,

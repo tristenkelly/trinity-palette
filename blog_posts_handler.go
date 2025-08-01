@@ -16,6 +16,7 @@ func (cfg *apiConfig) postsToServe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type postResponse struct {
+		Id         int       `json:"id"`
 		Post_title string    `json:"title"`
 		Post_body  string    `json:"body"`
 		CreatedAt  time.Time `json:"created_at"`
@@ -25,6 +26,7 @@ func (cfg *apiConfig) postsToServe(w http.ResponseWriter, r *http.Request) {
 	var responsePosts []postResponse
 	for _, post := range posts {
 		responsePosts = append(responsePosts, postResponse{
+			Id:         int(post.ID),
 			Post_title: post.Title,
 			Post_body:  post.Body,
 			CreatedAt:  post.CreatedAt,

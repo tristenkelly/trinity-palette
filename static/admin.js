@@ -115,7 +115,42 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     };
 
+    async function fetchPosts() {
+      const res = await fetch('/api/posts');
+      const posts = await res.json();
+      const list = document.getElementById('post-list');
+      list.innerHTML = '';
+
+      posts.forEach(post => {
+        const div = document.createElement('div');
+        div.classList.add('post');
+        div.innerHTML = `
+          <span>${post.title}</span>
+          <button onclick="deletePost('${post.id}')">Delete</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+
+    window.deletePost = async function (id) {
+      const confirmDelete = confirm("Are you sure you want to delete this post?");
+      if (!confirmDelete) return;
+
+      const res = await fetch(`/api/post/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        alert('Post deleted.');
+        fetchPosts();
+      } else {
+        alert('Failed to delete post.');
+      }
+    };
+
     fetchItems();
+    fetchPosts();
 
   } catch (err) {
     console.error('Auth check failed:', err);
