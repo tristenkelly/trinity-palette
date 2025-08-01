@@ -13,6 +13,10 @@ async function fetchAndDisplayItems() {
             const itemDiv = document.createElement('div');
             itemDiv.classList.add('product');
 
+            const itemImage = document.createElement('img')
+            itemImage.src = item.image_url;
+            itemImage.alt = item.product_name || "Product image";
+
             const itemName = document.createElement('h3');
             itemName.textContent = item.product_name;
 
@@ -29,6 +33,7 @@ async function fetchAndDisplayItems() {
             itemDiv.appendChild(itemDescription);
             itemDiv.appendChild(itemPrice);
             itemDiv.appendChild(itemStock);
+            itemDiv.appendChild(itemImage)
 
             itemsContainer.appendChild(itemDiv);
         });

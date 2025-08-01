@@ -13,16 +13,17 @@ import (
 )
 
 const createItem = `-- name: CreateItem :one
-INSERT INTO items (id, product_name, product_description, price, in_stock, updated_at)
+INSERT INTO items (id, product_name, product_description, price, in_stock, updated_at, image_url)
 VALUES (
     $1,
     $2,
     $3,
     $4,
     $5,
-    $6
+    $6,
+    $7
 )
-RETURNING id, product_name, product_description, price, in_stock, updated_at, product_image
+RETURNING id, product_name, product_description, price, in_stock, updated_at, image_url
 `
 
 type CreateItemParams struct {
@@ -32,6 +33,7 @@ type CreateItemParams struct {
 	Price              int32
 	InStock            bool
 	UpdatedAt          time.Time
+	ImageUrl           string
 }
 
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
@@ -42,6 +44,7 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 		arg.Price,
 		arg.InStock,
 		arg.UpdatedAt,
+		arg.ImageUrl,
 	)
 	var i Item
 	err := row.Scan(
@@ -51,20 +54,32 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 		&i.Price,
 		&i.InStock,
 		&i.UpdatedAt,
-		&i.ProductImage,
+		&i.ImageUrl,
 	)
 	return i, err
 }
 
+const deleteItem = `-- name: DeleteItem :exec
+DELETE FROM items 
+WHERE id = $1
+`
+
+func (q *Queries) DeleteItem(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteItem, id)
+	return err
+}
+
 const getItems = `-- name: GetItems :many
-SELECT product_name, product_description, price, in_stock FROM items
+SELECT id, product_name, product_description, price, in_stock, image_url FROM items
 `
 
 type GetItemsRow struct {
+	ID                 uuid.UUID
 	ProductName        string
 	ProductDescription string
 	Price              int32
 	InStock            bool
+	ImageUrl           string
 }
 
 func (q *Queries) GetItems(ctx context.Context) ([]GetItemsRow, error) {
@@ -77,10 +92,12 @@ func (q *Queries) GetItems(ctx context.Context) ([]GetItemsRow, error) {
 	for rows.Next() {
 		var i GetItemsRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.ProductName,
 			&i.ProductDescription,
 			&i.Price,
 			&i.InStock,
+			&i.ImageUrl,
 		); err != nil {
 			return nil, err
 		}

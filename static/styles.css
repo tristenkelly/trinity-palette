@@ -353,3 +353,143 @@ body {
   outline: none;
   box-shadow: 0 0 0 3px #ffc0cb;
 }
+
+.page-content.shop-page {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background-color: #f3d4fb;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.shop-gallery-wrapper {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  background: white;
+  border-radius: 2rem;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header section */
+.shop-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #4a4a4a;
+  margin-bottom: 0.5rem;
+}
+
+.shop-header p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.back-button {
+  background-color: #f7b6c8;
+  border: none;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 1.5rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  font-size: 0.9rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.back-button:hover {
+  background-color: #e48e9f;
+}
+
+/* Items container */
+.shop-items {
+  margin-top: 2rem;
+}
+
+/* Individual item card */
+.shop-item {
+  border: 2px solid #f7b6c8;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin: 0 auto;
+  max-width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  transition: transform 0.2s ease;
+}
+
+.shop-item:hover {
+  transform: translateY(-4px);
+}
+
+.shop-item img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+}
+
+.page-content.blog-page {
+  padding: 4rem 2rem;
+  background-color: #f3d4fb;
+  min-height: 100vh;
+}
+
+.blog-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.blog-title {
+  font-family: 'Pacifico', cursive;
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.blog-subtitle {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.1rem;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.blog-posts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+/* Example card structure if you're rendering individual posts */
+.blog-post {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  transition: transform 0.2s ease;
+}
+
+.blog-post:hover {
+  transform: translateY(-5px);
+}
+
+.blog-post h3 {
+  color: #d24874;
+  margin-bottom: 0.5rem;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.blog-post p {
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+
+

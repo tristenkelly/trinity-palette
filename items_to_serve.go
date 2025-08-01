@@ -19,6 +19,7 @@ func (cfg *apiConfig) itemsToServe(w http.ResponseWriter, r *http.Request) {
 		ProductDescription string `json:"product_description"`
 		Price              int32  `json:"price"`
 		InStock            bool   `json:"in_stock"`
+		Image_url          string `json:"image_url"`
 	}
 
 	var responseItems []ItemResponse
@@ -28,6 +29,7 @@ func (cfg *apiConfig) itemsToServe(w http.ResponseWriter, r *http.Request) {
 			ProductDescription: item.ProductDescription,
 			Price:              item.Price,
 			InStock:            item.InStock,
+			Image_url:          item.ImageUrl,
 		})
 	}
 

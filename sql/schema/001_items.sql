@@ -6,7 +6,8 @@ CREATE TABLE items(
     product_description TEXT NOT NULL,
     price INTEGER NOT NULL,
     in_stock BOOLEAN NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    updated_at TIMESTAMP NOT NULL,
+    image_url TEXT NOT NULL
 );
 
 -- +goose Down

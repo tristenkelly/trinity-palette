@@ -1,4 +1,3 @@
-// Submit Blog Post
 document.addEventListener('DOMContentLoaded', async () => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -24,88 +23,102 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-document.getElementById('post-form').addEventListener('submit', async (e) => {
+    // Submit Blog Post
+    document.getElementById('post-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const title = document.getElementById('post-title').value;
   const body = document.getElementById('post-body').value;
+  const token = localStorage.getItem('token'); // Get the token
 
-  const res = await fetch('/api/posts', {
+  const res = await fetch('/api/post', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`  // Attach the token here
+    },
     body: JSON.stringify({ title, body })
   });
 
-  if (res.ok) {
-    alert('Post published!');
-    e.target.reset();
+  // Optionally handle the response
+  if (!res.ok) {
+    const error = await res.text();
+    console.error('Post failed:', error);
+    alert('Failed to submit post');
   } else {
-    alert('Failed to create post.');
+    alert('Post submitted!');
   }
 });
 
-// Submit Item with Image
-document.getElementById('item-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const name = document.getElementById('item-name').value;
-  const image = document.getElementById('item-image').files[0];
-  const formData = new FormData();
 
-  formData.append('product_name', name);
-  formData.append('image', image);
+    // Submit Item with Image
+    document.getElementById('item-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('item-name').value;
+      const image = document.getElementById('item-image').files[0];
+      const description = document.getElementById('item-description').value
+      const price = document.getElementById('item-price').value
+      const instock = document.getElementById('item-instock').value
+      const formData = new FormData();
 
-  const res = await fetch('/api/items', {
-    method: 'POST',
-    body: formData
-  });
+      formData.append('product_name', name);
+      formData.append('product_description', description)
+      formData.append('image', image);
+      formData.append('price', price);
+      formData.append('in_stock', instock);
 
-  if (res.ok) {
-    alert('Item added!');
-    e.target.reset();
-  } else {
-    alert('Failed to add item.');
-  }
-});
+      const res = await fetch('/admin/item/create', {
+        method: 'POST',
+        body: formData
+      });
 
-// Fetch items for deletion
-async function fetchItems() {
-  const res = await fetch('/api/items');
-  const items = await res.json();
-  const list = document.getElementById('item-list');
-  list.innerHTML = '';
+      if (res.ok) {
+        alert('Item added!');
+        e.target.reset();
+        fetchItems(); // Refresh the list after adding
+      } else {
+        alert('Failed to add item.');
+      }
+    });
 
-  items.forEach(item => {
-    const div = document.createElement('div');
-    div.classList.add('item');
-    div.innerHTML = `
-      <span>${item.product_name}</span>
-      <button onclick="deleteItem('${item.id}')">Delete</button>
-    `;
-    list.appendChild(div);
-  });
-}
+    // Fetch items for deletion
+    async function fetchItems() {
+      const res = await fetch('/api/items');
+      const items = await res.json();
+      const list = document.getElementById('item-list');
+      list.innerHTML = '';
 
-// Delete item
-async function deleteItem(id) {
-  const confirmDelete = confirm("Are you sure you want to delete this item?");
-  if (!confirmDelete) return;
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('item');
+        div.innerHTML = `
+          <span>${item.product_name}</span>
+          <button onclick="deleteItem('${item.id}')">Delete</button>
+        `;
+        list.appendChild(div);
+      });
+    }
 
-  const res = await fetch(`/api/items/${id}`, {
-    method: 'DELETE'
-  });
+    // Delete item
+    window.deleteItem = async function (id) {
+      const confirmDelete = confirm("Are you sure you want to delete this item?");
+      if (!confirmDelete) return;
 
-  if (res.ok) {
-    alert('Item deleted.');
+      const res = await fetch(`/api/item/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        alert('Item deleted.');
+        fetchItems();
+      } else {
+        alert('Failed to delete item.');
+      }
+    };
+
     fetchItems();
-  } else {
-    alert('Failed to delete item.');
-  }
-}
 
   } catch (err) {
     console.error('Auth check failed:', err);
     window.location.href = '/login';
   }
 });
-
-// Load items on start
-fetchItems();

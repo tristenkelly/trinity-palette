@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
 	_ "github.com/lib/pq"
 	"github.com/lpernett/godotenv"
 	"github.com/tristenkelly/the-trinity-pallette/internal/database"
@@ -17,68 +19,79 @@ type apiConfig struct {
 	filepath_dir string
 	db           *database.Queries
 	jwtsecret    string
+	port         string
 }
 
+type productImage struct {
+	data      []byte
+	mediaType string
+}
+
+var itemImages = map[uuid.UUID]productImage{}
+
 func main() {
+	r := chi.NewRouter()
 	godotenv.Load(".env")
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
 	dbQueries := database.New(db)
 	jwt_secret := os.Getenv("SECRET")
+	port := os.Getenv("PORT")
 
 	if err != nil {
 		log.Printf("error getting database url: %v", err)
 	}
 
-	mux := http.NewServeMux()
-	server := http.Server{
-		Addr:    ":8080",
-		Handler: mux,
-	}
-
 	cfg := apiConfig{
 		db:        dbQueries,
 		jwtsecret: jwt_secret,
+		port:      port,
+	}
+
+	server := http.Server{
+		Addr:    ":8080",
+		Handler: r,
 	}
 
 	fs := http.FileServer(http.Dir("./static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", fs))
+	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "index.html")
 	})
 
-	mux.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "login.html")
 	})
 
-	mux.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "register.html")
 	})
 
-	mux.HandleFunc("/forgotpassword", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/forgotpassword", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "changepass.html")
 	})
 
-	mux.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
 		renderTemplate(w, "admin.html")
 	})
 
-	mux.HandleFunc("GET /shop", shopHandler)
-	mux.HandleFunc("POST /admin/item/create", cfg.createItem)
-	mux.HandleFunc("POST /admin/reset", cfg.resetItems)
-	mux.HandleFunc("GET /blog", cfg.blogHandler)
-	mux.HandleFunc("POST /admin/blog/create", cfg.createPost)
-	mux.HandleFunc("/api/posts", cfg.postsToServe)
-	mux.HandleFunc("/api/items", cfg.itemsToServe)
-	mux.HandleFunc("/api/login", cfg.handleLogin)
-	mux.HandleFunc("/api/register", cfg.signUpHandler)
-	mux.HandleFunc("api/getrt", cfg.getRefreshToken)
-	mux.HandleFunc("POST admin/revoketoken", cfg.revokeRefreshToken)
-	mux.HandleFunc("/api/changepassword", cfg.changePassword)
-	mux.HandleFunc("/api/changeemail", cfg.changeEmail)
-	mux.HandleFunc("/api/verify", cfg.handleVerifyToken)
-	mux.HandleFunc("/api/userInfo", cfg.userInfo)
+	r.Get("/shop", shopHandler)
+	r.Post("/admin/item/create", cfg.createItem)
+	r.Post("/admin/reset", cfg.resetItems)
+	r.Get("/blog", cfg.blogHandler)
+	r.Post("/api/post", cfg.createPost)
+	r.HandleFunc("/api/posts", cfg.postsToServe)
+	r.HandleFunc("/api/items", cfg.itemsToServe)
+	r.HandleFunc("/api/login", cfg.handleLogin)
+	r.HandleFunc("/api/register", cfg.signUpHandler)
+	r.HandleFunc("/api/getrt", cfg.getRefreshToken)
+	r.Post("/admin/revoketoken", cfg.revokeRefreshToken)
+	r.HandleFunc("/api/changepassword", cfg.changePassword)
+	r.HandleFunc("/api/changeemail", cfg.changeEmail)
+	r.HandleFunc("/api/verify", cfg.handleVerifyToken)
+	r.HandleFunc("/api/userInfo", cfg.userInfo)
+	r.Delete("/api/item/{itemID}", cfg.deleteItem)
 	log.Println("Server running on http://localhost:8080")
 	http.ListenAndServe(server.Addr, server.Handler)
 }

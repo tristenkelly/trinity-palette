@@ -18,7 +18,7 @@ type Item struct {
 	Price              int32
 	InStock            bool
 	UpdatedAt          time.Time
-	ProductImage       string
+	ImageUrl           string
 }
 
 type Post struct {

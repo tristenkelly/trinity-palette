@@ -10,16 +10,19 @@
 </head>
 <body>
   {{ template "navbar" }}
-  <div class="page-content">
-  <div class="container">
-    <h1>Our Gallery</h1>
-    <p>Check out our beautiful art pieces!</p>
-    <a class="btn" href="/">Back to Home</a>
+<div class="page-content shop-page">
+  <div class="shop-gallery-wrapper">
+    <div class="shop-header">
+      <h2>Our Gallery</h2>
+      <p>Check out today’s cutest pieces!</p>
+      <button class="back-button" onclick="window.location.href='/'">Back to Home</button>
+    </div>
 
     <div class="gallery" id="gallery">
       <!-- JS will insert items here -->
     </div>
   </div>
+</div>
 </div>
 
   <script src="/static/shop.js"></script>
