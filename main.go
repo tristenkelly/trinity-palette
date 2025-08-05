@@ -16,11 +16,9 @@ import (
 )
 
 type apiConfig struct {
-	s3bucket     string
-	filepath_dir string
-	db           *database.Queries
-	jwtsecret    string
-	port         string
+	db        *database.Queries
+	jwtsecret string
+	port      string
 }
 
 type productImage struct {

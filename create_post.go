@@ -49,6 +49,11 @@ func (cfg *apiConfig) createPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post, err := cfg.db.CreatePost(r.Context(), queryParams)
+	if err != nil {
+		log.Printf("error creating post in db: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	type returnPost struct {
 		Title     string    `json:"title"`

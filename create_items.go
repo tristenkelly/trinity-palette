@@ -28,6 +28,11 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 	itemID := uuid.New()
 
 	filedata, header, err := r.FormFile("image")
+	if err != nil {
+		log.Printf("error getting filedata from form: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 	data, err := io.ReadAll(filedata)
 	if err != nil {
 		log.Printf("error reading filedata in image %v", err)

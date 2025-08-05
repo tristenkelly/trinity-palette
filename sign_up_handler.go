@@ -48,6 +48,11 @@ func (cfg *apiConfig) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := cfg.db.CreateUser(r.Context(), queryParams)
+	if err != nil {
+		log.Printf("error creating user in db: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	token, err := auth.MakeJWT(user.ID, cfg.jwtsecret)
 	if err != nil {
