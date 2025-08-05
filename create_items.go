@@ -29,9 +29,9 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 
 	filedata, header, err := r.FormFile("image")
 	data, err := io.ReadAll(filedata)
-	filedata.Close()
-	if err != nil {
-		log.Printf("error reading filedata in image %v", err)
+	err2 := filedata.Close()
+	if err2 != nil {
+		log.Printf("error reading filedata in image %v", err2)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -84,7 +84,12 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 	inStockStr := r.FormValue("in_stock")
 
 	var price int
-	fmt.Sscanf(priceStr, "%d", &price)
+	_, err5 := fmt.Sscanf(priceStr, "%d", &price)
+	if err5 != nil {
+		log.Printf("error parsing price: %v", err5)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	var inStock bool
 	if inStockStr == "true" || inStockStr == "1" {
@@ -117,5 +122,10 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(val)
+	_, err6 := w.Write(val)
+	if err6 != nil {
+		log.Printf("error writing response: %v", err6)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

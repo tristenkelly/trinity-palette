@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -49,8 +50,12 @@ func main() {
 	}
 
 	server := http.Server{
-		Addr:    ":8080",
-		Handler: r,
+		Addr:              ":8080",
+		Handler:           r,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       120 * time.Second,
 	}
 
 	fs := http.FileServer(http.Dir("./static"))
@@ -94,7 +99,10 @@ func main() {
 	r.Delete("/api/item/{itemID}", cfg.deleteItem)
 	r.Delete("/api/post/{postID}", cfg.deletePost)
 	log.Println("Server running on http://localhost:8080")
-	http.ListenAndServe(server.Addr, server.Handler)
+	err2 := server.ListenAndServe()
+	if err2 != nil {
+		log.Fatal("Error starting server:", err2)
+	}
 }
 
 func renderTemplate(w http.ResponseWriter, filename string) {
