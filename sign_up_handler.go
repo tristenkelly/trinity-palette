@@ -48,6 +48,11 @@ func (cfg *apiConfig) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := cfg.db.CreateUser(r.Context(), queryParams)
+	if err != nil {
+		log.Printf("error creating user in db: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	token, err := auth.MakeJWT(user.ID, cfg.jwtsecret)
 	if err != nil {
@@ -78,5 +83,10 @@ func (cfg *apiConfig) signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(201)
-	w.Write(val)
+	_, err2 := w.Write(val)
+	if err2 != nil {
+		log.Printf("error writing response: %v", err2)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

@@ -38,7 +38,11 @@ func (cfg *apiConfig) itemsToServe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(responseItems)
-	log.Printf("items returned: %v", responseItems)
+	err2 := json.NewEncoder(w).Encode(responseItems)
+	if err2 != nil {
+		log.Printf("error encoding struct: %v", err2)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 }

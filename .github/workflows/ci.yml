@@ -1,0 +1,30 @@
+name: Go Lint & Security
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint-and-security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.5'
+
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: Install staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+
+      - name: Run gosec
+        run: ~/go/bin/gosec -exclude-dir=internal/database ./...
+
+      - name: Run staticcheck
+        run: ~/go/bin/staticcheck ./...
