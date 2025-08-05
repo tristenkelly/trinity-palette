@@ -34,7 +34,7 @@ func main() {
 	r := chi.NewRouter()
 	err1 := godotenv.Load(".env")
 	if err1 != nil {
-		log.Fatal("error loading .env file: %v", err1)
+		log.Fatal("error loading .env file", err1)
 	}
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
