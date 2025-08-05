@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -15,11 +16,9 @@ import (
 )
 
 type apiConfig struct {
-	s3bucket     string
-	filepath_dir string
-	db           *database.Queries
-	jwtsecret    string
-	port         string
+	db        *database.Queries
+	jwtsecret string
+	port      string
 }
 
 type productImage struct {
@@ -31,7 +30,10 @@ var itemImages = map[uuid.UUID]productImage{}
 
 func main() {
 	r := chi.NewRouter()
-	godotenv.Load(".env")
+	err1 := godotenv.Load(".env")
+	if err1 != nil {
+		log.Fatal("error loading .env file", err1)
+	}
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
 	dbQueries := database.New(db)
@@ -49,8 +51,12 @@ func main() {
 	}
 
 	server := http.Server{
-		Addr:    ":8080",
-		Handler: r,
+		Addr:              ":8080",
+		Handler:           r,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      10 * time.Second,
+		IdleTimeout:       120 * time.Second,
 	}
 
 	fs := http.FileServer(http.Dir("./static"))
@@ -94,7 +100,10 @@ func main() {
 	r.Delete("/api/item/{itemID}", cfg.deleteItem)
 	r.Delete("/api/post/{postID}", cfg.deletePost)
 	log.Println("Server running on http://localhost:8080")
-	http.ListenAndServe(server.Addr, server.Handler)
+	err2 := server.ListenAndServe()
+	if err2 != nil {
+		log.Fatal("Error starting server:", err2)
+	}
 }
 
 func renderTemplate(w http.ResponseWriter, filename string) {
@@ -104,5 +113,10 @@ func renderTemplate(w http.ResponseWriter, filename string) {
 		log.Println("Template error:", err)
 		return
 	}
-	tmpl.Execute(w, nil)
+	err2 := tmpl.Execute(w, nil)
+	if err2 != nil {
+		http.Error(w, "Error rendering template", 500)
+		log.Println("Template execution error:", err2)
+		return
+	}
 }

@@ -18,6 +18,11 @@ func (cfg *apiConfig) changePassword(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	params := passParams{}
 	err := decoder.Decode(&params)
+	if err != nil {
+		log.Printf("error decoding password change params: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	hashedPass, err := auth.HashPassword(params.Password)
 	if err != nil {
@@ -50,6 +55,11 @@ func (cfg *apiConfig) changeEmail(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	params := passParams{}
 	err := decoder.Decode(&params)
+	if err != nil {
+		log.Printf("error decoding email change params: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil {

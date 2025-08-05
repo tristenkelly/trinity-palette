@@ -52,5 +52,10 @@ func (cfg *apiConfig) userInfo(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusAccepted)
-	w.Write(val)
+	_, err3 := w.Write(val)
+	if err3 != nil {
+		log.Printf("error writing response: %v", err3)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

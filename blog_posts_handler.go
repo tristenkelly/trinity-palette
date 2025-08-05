@@ -35,7 +35,11 @@ func (cfg *apiConfig) postsToServe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(responsePosts)
-	log.Printf("items returned: %v", responsePosts)
+	err2 := json.NewEncoder(w).Encode(responsePosts)
+	if err2 != nil {
+		log.Printf("error encoding struct: %v", err2)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 }
