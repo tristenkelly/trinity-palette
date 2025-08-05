@@ -405,12 +405,12 @@ body {
 }
 
 /* Items container */
-.shop-items {
+.product {
   margin-top: 2rem;
 }
 
 /* Individual item card */
-.shop-item {
+.product {
   border: 2px solid #f7b6c8;
   border-radius: 1rem;
   padding: 1rem;
@@ -421,11 +421,11 @@ body {
   transition: transform 0.2s ease;
 }
 
-.shop-item:hover {
+.product:hover {
   transform: translateY(-4px);
 }
 
-.shop-item img {
+.product img {
   max-width: 100%;
   height: auto;
   margin-top: 1rem;

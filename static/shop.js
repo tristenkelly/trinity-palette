@@ -33,7 +33,7 @@ async function fetchAndDisplayItems() {
             itemDiv.appendChild(itemDescription);
             itemDiv.appendChild(itemPrice);
             itemDiv.appendChild(itemStock);
-            itemDiv.appendChild(itemImage)
+            itemDiv.appendChild(itemImage);
 
             itemsContainer.appendChild(itemDiv);
         });
