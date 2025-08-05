@@ -59,7 +59,7 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	encodedFile := base64.RawURLEncoding.EncodeToString(randkey)
-	dir := filepath.Join("static/assets/", encodedFile+ctype)
+	dir := filepath.Clean(filepath.Join("static/assets/", encodedFile+ctype))
 	newFile, err := os.Create(dir)
 	if err != nil {
 		log.Printf("coudn't create file")

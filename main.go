@@ -32,7 +32,10 @@ var itemImages = map[uuid.UUID]productImage{}
 
 func main() {
 	r := chi.NewRouter()
-	godotenv.Load(".env")
+	err1 := godotenv.Load(".env")
+	if err1 != nil {
+		log.Fatal("error loading .env file: %v", err1)
+	}
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
 	dbQueries := database.New(db)
