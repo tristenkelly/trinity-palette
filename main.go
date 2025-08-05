@@ -112,5 +112,10 @@ func renderTemplate(w http.ResponseWriter, filename string) {
 		log.Println("Template error:", err)
 		return
 	}
-	tmpl.Execute(w, nil)
+	err2 := tmpl.Execute(w, nil)
+	if err2 != nil {
+		http.Error(w, "Error rendering template", 500)
+		log.Println("Template execution error:", err2)
+		return
+	}
 }

@@ -29,9 +29,8 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 
 	filedata, header, err := r.FormFile("image")
 	data, err := io.ReadAll(filedata)
-	err2 := filedata.Close()
-	if err2 != nil {
-		log.Printf("error reading filedata in image %v", err2)
+	if err != nil {
+		log.Printf("error reading filedata in image %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -61,21 +60,31 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 	}
 	encodedFile := base64.RawURLEncoding.EncodeToString(randkey)
 	dir := filepath.Join("static/assets/", encodedFile+ctype)
-	file, err := os.Create(dir)
+	newFile, err := os.Create(dir)
 	if err != nil {
 		log.Printf("coudn't create file")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	defer file.Close()
+	defer newFile.Close()
 	_, err3 := filedata.Seek(0, io.SeekStart)
 	if err3 != nil {
 		log.Printf("coudn't seek start of filedata")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	io.Copy(file, filedata)
-	filedata.Close()
+	_, err6 := io.Copy(newFile, filedata)
+	if err6 != nil {
+		log.Printf("error copying filedata to file: %v", err6)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	err2 := filedata.Close()
+	if err2 != nil {
+		log.Printf("error closing filedata: %v", err2)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	dataURL := fmt.Sprintf("http://localhost:%v/static/assets/%v%v", cfg.port, encodedFile, ctype)
 
 	name := r.FormValue("product_name")
@@ -83,7 +92,7 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 	priceStr := r.FormValue("price")
 	inStockStr := r.FormValue("in_stock")
 
-	var price int
+	var price int32
 	_, err5 := fmt.Sscanf(priceStr, "%d", &price)
 	if err5 != nil {
 		log.Printf("error parsing price: %v", err5)
@@ -100,7 +109,7 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 		ID:                 itemID,
 		ProductName:        name,
 		ProductDescription: description,
-		Price:              int32(price),
+		Price:              price,
 		InStock:            inStock,
 		UpdatedAt:          time.Now(),
 		ImageUrl:           dataURL,
@@ -122,9 +131,9 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_, err6 := w.Write(val)
-	if err6 != nil {
-		log.Printf("error writing response: %v", err6)
+	_, err7 := w.Write(val)
+	if err7 != nil {
+		log.Printf("error writing response: %v", err7)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

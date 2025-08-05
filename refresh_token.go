@@ -54,7 +54,12 @@ func (cfg *apiConfig) getRefreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(200)
-	w.Write(val)
+	_, err2 := w.Write(val)
+	if err2 != nil {
+		log.Printf("error writing response: %v", err2)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 }
 
