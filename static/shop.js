@@ -29,11 +29,25 @@ async function fetchAndDisplayItems() {
             const itemStock = document.createElement('p');
             itemStock.textContent = item.in_stock ? "In stock" : "Out of stock";
 
+            const addToCartButton = document.createElement('button');
+            addToCartButton.textContent = "Add to Cart";
+            addToCartButton.onclick = () => {
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                if (!cart.find(cartItem => cartItem.id === item.id)) {
+                    cart.push(item);
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    alert(`${item.product_name} added to cart!`);
+                } else {
+                    alert(`${item.product_name} is already in your cart.`);
+                }
+            };
+
             itemDiv.appendChild(itemName);
             itemDiv.appendChild(itemDescription);
             itemDiv.appendChild(itemPrice);
             itemDiv.appendChild(itemStock);
             itemDiv.appendChild(itemImage);
+            itemDiv.appendChild(addToCartButton);
 
             itemsContainer.appendChild(itemDiv);
         });
