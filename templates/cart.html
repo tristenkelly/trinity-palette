@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Cart - The Trinity Palette</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  {{ template "navbar" }}
+    <div class="page-content cart-page">
+        <div class="cart-container">
+        <h1 class="cart-title">Your Cart</h1>
+        <p class="cart-subtitle">Review your items before checkout</p>
+        <button class="back-button" onclick="window.location.href='/shop'">Continue Shopping</button>
+        <div id="cart-items" class="cart-items">
+
+        </div>
+        <div class="cart-total">
+          <h2>Total: <span id="cart-total"></span></h2>
+        </div>
+        <button id="checkout-button" class="checkout-button" onclick="checkout()">Checkout</button>
+        <script src="/static/cart.js"></script>
+        <script src="/static/auth.js"></script>
+      </div>
+    </div>

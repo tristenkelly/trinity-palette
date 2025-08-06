@@ -82,6 +82,10 @@ func main() {
 		renderTemplate(w, "admin.html")
 	})
 
+	r.HandleFunc("/cart", func(w http.ResponseWriter, r *http.Request) {
+		renderTemplate(w, "cart.html")
+	})
+
 	r.Get("/shop", shopHandler)
 	r.Post("/admin/item/create", cfg.createItem)
 	r.Post("/admin/reset", cfg.resetItems)
