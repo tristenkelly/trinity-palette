@@ -8,3 +8,4 @@ test.test
 **/terraform.tfstate.backup
 **/*.tfplan
 **/*.tfplan.*
+**/errored.tfstate

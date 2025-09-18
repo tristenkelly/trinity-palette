@@ -51,7 +51,7 @@ func main() {
 	}
 
 	server := http.Server{
-		Addr:              ":8080",
+		Addr:              "0.0.0.0:8080",
 		Handler:           r,
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,
@@ -103,7 +103,7 @@ func main() {
 	r.HandleFunc("/api/userInfo", cfg.userInfo)
 	r.Delete("/api/item/{itemID}", cfg.deleteItem)
 	r.Delete("/api/post/{postID}", cfg.deletePost)
-	log.Println("Server running on http://localhost:8080")
+	log.Println("Server running on http://0.0.0.0:8080")
 	err2 := server.ListenAndServe()
 	if err2 != nil {
 		log.Fatal("Error starting server:", err2)
