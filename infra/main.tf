@@ -37,11 +37,11 @@ module "vpc-infra" {
 module "rds-infra" {
   source = "./modules/rds"
 
-  db_identifier          = local.db_identifier
+  db_identifier         = local.db_identifier
   vpc_id                = module.vpc-infra.vpc_id
   private_subnet_ids    = module.vpc-infra.private_subnet_ids
   ec2_security_group_id = module.ec2-infra.security_group_id
-  
+
   depends_on = [module.vpc-infra, module.ec2-infra]
 }
 
@@ -50,7 +50,7 @@ module "ec2-infra" {
 
   ami_id        = local.ec2_ami_id
   instance_type = local.ec2_instance_type
-  subnet_id     = module.vpc-infra.public_subnet_ids[0]  # Changed to public subnet
+  subnet_id     = module.vpc-infra.public_subnet_ids[0] # Changed to public subnet
   vpc_id        = module.vpc-infra.vpc_id
   app_port      = local.app_port
   # key_pair_name = local.key_pair_name  # Uncomment if you want SSH access
