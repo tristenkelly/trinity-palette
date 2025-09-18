@@ -1,16 +1,16 @@
 output "instance_id" {
   description = "The ID of the EC2 instance"
-  value       = aws_ec2_instance.tp_app.id
+  value       = aws_instance.tp_app.id
 }
 
 output "instance_public_ip" {
   description = "The public IP address of the EC2 instance"
-  value       = aws_ec2_instance.tp_app.public_ip
+  value       = aws_instance.tp_app.public_ip
 }
 
 output "instance_private_ip" {
   description = "The private IP address of the EC2 instance"
-  value       = aws_ec2_instance.tp_app.private_ip
+  value       = aws_instance.tp_app.private_ip
 }
 
 output "security_group_id" {

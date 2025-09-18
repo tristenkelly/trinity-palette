@@ -44,12 +44,15 @@ resource "aws_security_group" "ec2_sg" {
   }
 }
 
-resource "aws_ec2_instance" "tp_app" {
+resource "aws_instance" "tp_app" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   subnet_id              = var.subnet_id
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
   associate_public_ip_address = true
+  
+  # User data script for Docker setup
+  user_data = var.user_data
 
   tags = {
     Name    = "tpAppInstance"
