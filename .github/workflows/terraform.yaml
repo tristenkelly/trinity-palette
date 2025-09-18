@@ -1,40 +1,59 @@
 name: "Terraform"
 
 on:
-    push:
-        branches:
-            - main
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+        - plan
+        - apply
+        - destroy
+  pull_request:
+    paths:
+      - 'infra/**'
+    branches:
+      - main
+
 jobs:
-    terraform:
-        name: "Terraform"
-        runs-on: ubuntu-latest
-        env:
-            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        defaults:
-            run:
-                working-directory: infra
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-            - name: Setup Terraform
-              uses: hashicorp/setup-terraform@v2
-              with:
-                  terraform_version: 1.13.3
-                  terraform_wrapper: false
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.7.6
+        terraform_wrapper: false
 
-            - name: Terraform Format
-              run: terraform fmt -check
+    - name: Terraform Format
+      run: terraform fmt -check
 
-            - name: Terraform Init
-              run: terraform init
+    - name: Terraform Init
+      run: terraform init
 
-            - name: Terraform Validate
-              run: terraform validate
+    - name: Terraform Validate
+      run: terraform validate
 
-            - name: Terraform Plan
-              run: terraform plan -no-color
+    - name: Terraform Plan
+      run: terraform plan -no-color
 
-            - name: Terraform Apply
-              run: terraform apply -auto-approve
+    - name: Terraform Apply
+      if: github.event.inputs.action == 'apply' && github.event_name == 'workflow_dispatch'
+      run: terraform apply -auto-approve
+
+    - name: Terraform Destroy
+      if: github.event.inputs.action == 'destroy' && github.event_name == 'workflow_dispatch'
+      run: terraform destroy -auto-approve

@@ -1,11 +1,9 @@
 .env
 test.test
 .vscode
-
-**/.terraform/
-**/.terraform.lock.hcl
-**/terraform.tfstate
-**/terraform.tfstate.backup
-**/*.tfplan
-**/*.tfplan.*
-**/errored.tfstate
+/infra/.terraform/*
+/infra/terraform.tfstate
+/infra/terraform.tfstate.backup
+/infra/.terraform.lock.hcl
+.dockerignore
+docker-compose.yaml

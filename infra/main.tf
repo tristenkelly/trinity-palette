@@ -25,6 +25,12 @@ module "tf-state" {
   bucket_name = "the-trinity-pallette-terraform-state"
 }
 
+module "s3-static" {
+  source      = "./modules/s3-static"
+  bucket_name = "the-trinity-pallette-static-assets"
+  environment = "production"
+}
+
 module "vpc-infra" {
   source = "./modules/vpc"
 
@@ -37,12 +43,11 @@ module "vpc-infra" {
 module "rds-infra" {
   source = "./modules/rds"
 
-  db_identifier         = local.db_identifier
-  vpc_id                = module.vpc-infra.vpc_id
-  private_subnet_ids    = module.vpc-infra.private_subnet_ids
-  ec2_security_group_id = module.ec2-infra.security_group_id
-
-  depends_on = [module.vpc-infra, module.ec2-infra]
+  db_identifier      = local.db_identifier
+  vpc_id            = module.vpc-infra.vpc_id
+  private_subnet_ids = module.vpc-infra.private_subnet_ids
+  
+  depends_on = [module.vpc-infra]
 }
 
 module "ec2-infra" {
@@ -50,25 +55,50 @@ module "ec2-infra" {
 
   ami_id        = local.ec2_ami_id
   instance_type = local.ec2_instance_type
-  subnet_id     = module.vpc-infra.public_subnet_ids[0] # Changed to public subnet
+  subnet_id     = module.vpc-infra.public_subnet_ids[0]
   vpc_id        = module.vpc-infra.vpc_id
   app_port      = local.app_port
-  # key_pair_name = local.key_pair_name  # Uncomment if you want SSH access
+  user_data     = local.user_data
 }
 
-# Outputs
-output "ec2_public_ip" {
-  description = "Public IP address of the EC2 instance"
-  value       = module.ec2-infra.instance_public_ip
+# Store RDS credentials in Systems Manager Parameter Store
+resource "aws_ssm_parameter" "rds_endpoint" {
+  name  = "/trinity-palette/database/endpoint"
+  type  = "String"
+  value = module.rds-infra.db_endpoint
+  
+  tags = {
+    Environment = "production"
+    Project     = "trinity-palette"
+  }
+  
+  depends_on = [module.rds-infra]
 }
 
-output "ec2_private_ip" {
-  description = "Private IP address of the EC2 instance"
-  value       = module.ec2-infra.instance_private_ip
+resource "aws_ssm_parameter" "rds_password" {
+  name  = "/trinity-palette/database/password"
+  type  = "SecureString"
+  value = module.rds-infra.db_password
+  
+  tags = {
+    Environment = "production" 
+    Project     = "trinity-palette"
+  }
+  
+  depends_on = [module.rds-infra]
 }
 
-output "rds_endpoint" {
-  description = "RDS instance endpoint"
-  value       = module.rds-infra.db_endpoint
-  sensitive   = true
+resource "aws_ssm_parameter" "jwt_secret" {
+  name  = "/trinity-palette/app/jwt-secret"
+  type  = "SecureString"
+  value = "your-super-secret-jwt-key-${random_id.jwt_suffix.hex}"
+  
+  tags = {
+    Environment = "production"
+    Project     = "trinity-palette"
+  }
+}
+
+resource "random_id" "jwt_suffix" {
+  byte_length = 16
 }

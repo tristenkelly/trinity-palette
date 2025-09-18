@@ -10,8 +10,11 @@ import (
 	"mime"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 
 	"github.com/google/uuid"
 	"github.com/tristenkelly/the-trinity-pallette/internal/database"
@@ -64,33 +67,56 @@ func (cfg *apiConfig) createItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	encodedFile := base64.RawURLEncoding.EncodeToString(randkey)
-	dir := filepath.Clean(filepath.Join("static/assets/", encodedFile+ctype))
-	newFile, err := os.Create(dir)
+
+	staticBucketName := os.Getenv("STATIC_BUCKET")
+	if staticBucketName == "" {
+		staticBucketName = "the-trinity-pallette-static-assets"
+	}
+
+	sess, err := session.NewSession(&aws.Config{
+		Region: aws.String(os.Getenv("AWS_REGION")),
+	})
 	if err != nil {
-		log.Printf("coudn't create file")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	defer newFile.Close()
-	_, err3 := filedata.Seek(0, io.SeekStart)
-	if err3 != nil {
-		log.Printf("coudn't seek start of filedata")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	_, err6 := io.Copy(newFile, filedata)
-	if err6 != nil {
-		log.Printf("error copying filedata to file: %v", err6)
+		log.Printf("error creating AWS session: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	s3Client := s3.New(sess)
+
+	_, err3 := filedata.Seek(0, io.SeekStart)
+	if err3 != nil {
+		log.Printf("couldn't seek start of filedata")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	key := fmt.Sprintf("assets/%s%s", encodedFile, ctype)
+	_, err = s3Client.PutObject(&s3.PutObjectInput{
+		Bucket:      aws.String(staticBucketName),
+		Key:         aws.String(key),
+		Body:        filedata,
+		ContentType: aws.String(mime.TypeByExtension(ctype)),
+		ACL:         aws.String("public-read"),
+	})
+	if err != nil {
+		log.Printf("error uploading to S3: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	err2 := filedata.Close()
 	if err2 != nil {
 		log.Printf("error closing filedata: %v", err2)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	dataURL := fmt.Sprintf("http://localhost:%v/static/assets/%v%v", cfg.port, encodedFile, ctype)
+
+	staticBaseURL := os.Getenv("STATIC_BASE_URL")
+	if staticBaseURL == "" {
+		staticBaseURL = fmt.Sprintf("https://%s.s3.amazonaws.com", staticBucketName)
+	}
+	dataURL := fmt.Sprintf("%s/%s", staticBaseURL, key)
 
 	name := r.FormValue("product_name")
 	description := r.FormValue("product_description")

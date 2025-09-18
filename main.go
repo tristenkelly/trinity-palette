@@ -34,10 +34,10 @@ func main() {
 	if err1 != nil {
 		log.Fatal("error loading .env file", err1)
 	}
-	dbURL := os.Getenv("DB_URL")
+	dbURL := os.Getenv("DATABASE_URL")
 	db, err := sql.Open("postgres", dbURL)
 	dbQueries := database.New(db)
-	jwt_secret := os.Getenv("SECRET")
+	jwt_secret := os.Getenv("JWT_SECRET")
 	port := os.Getenv("PORT")
 
 	if err != nil {

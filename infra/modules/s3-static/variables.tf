@@ -4,7 +4,7 @@ variable "bucket_name" {
 }
 
 variable "environment" {
-  description = "Environment name"
+  description = "Environment name (e.g., production, development)"
   type        = string
   default     = "production"
 }
