@@ -32,13 +32,18 @@ func main() {
 	r := chi.NewRouter()
 	err1 := godotenv.Load(".env")
 	if err1 != nil {
-		log.Fatal("error loading .env file", err1)
+		log.Printf("warning: could not load .env file (this is ok if using environment variables): %v", err1)
 	}
 	dbURL := os.Getenv("DATABASE_URL")
 	db, err := sql.Open("postgres", dbURL)
 	dbQueries := database.New(db)
 	jwt_secret := os.Getenv("JWT_SECRET")
-	port := os.Getenv("PORT")
+	port := os.Getenv("APP_PORT")
+
+	// Default to 8080 if no port is specified
+	if port == "" {
+		port = "8080"
+	}
 
 	if err != nil {
 		log.Printf("error getting database url: %v", err)
@@ -51,7 +56,7 @@ func main() {
 	}
 
 	server := http.Server{
-		Addr:              "0.0.0.0:8080",
+		Addr:              "0.0.0.0:" + port,
 		Handler:           r,
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,

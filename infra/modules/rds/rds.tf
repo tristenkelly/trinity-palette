@@ -11,13 +11,13 @@ resource "aws_db_instance" "default" {
   allocated_storage    = 20
   storage_type         = "gp2"
   engine               = "postgres"
-  engine_version       = "13.4"
-  instance_class       = "db.t2.medium"
+  engine_version       = "13.22" 
+  instance_class       = "db.t3.micro" 
   db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   username             = "sadmin"
   password             = data.aws_secretsmanager_secret_version.password.secret_string
-  skip_final_snapshot  = false
+  skip_final_snapshot  = true  
 }
 
 resource "aws_db_subnet_group" "db_subnet_group" {

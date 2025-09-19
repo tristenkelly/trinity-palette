@@ -30,3 +30,9 @@ variable "user_data" {
     type        = string
     default     = ""
 }
+
+variable "key_name" {
+    description = "The name of the EC2 key pair for SSH access"
+    type        = string
+    default     = null
+}

@@ -107,6 +107,7 @@ resource "aws_instance" "tp_app" {
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
   associate_public_ip_address = true
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
+  key_name              = var.key_name
   
   # User data script for Docker setup
   user_data = var.user_data

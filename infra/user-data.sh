@@ -24,6 +24,7 @@ chmod +x /usr/local/bin/docker-compose
 # Create app directory
 mkdir -p /opt/trinity-palette
 cd /opt/trinity-palette
+chown -R ec2-user:ec2-user /opt/trinity-palette
 
 # Create docker-compose.yml
 cat > docker-compose.yml << 'EOF'
@@ -72,6 +73,11 @@ APP_PORT=${app_port}
 APP_ENV=production
 EOF
 
+# Fix ownership and permissions
+chown ec2-user:ec2-user .env
+chmod 644 .env
+chown -R ec2-user:ec2-user /opt/trinity-palette
+
 # Create systemd service
 cat > /etc/systemd/system/trinity-palette.service << 'EOF'
 [Unit]
@@ -107,11 +113,12 @@ docker image prune -f
 EOF
 
 chmod +x /opt/trinity-palette/deploy.sh
+chown ec2-user:ec2-user /opt/trinity-palette/deploy.sh
 
 # Log completion
 echo "Trinity Palette setup completed at $(date)" >> /var/log/trinity-palette-setup.log
 echo "Application should be running on port ${app_port}" >> /var/log/trinity-palette-setup.log
 echo "Database automatically configured from SSM Parameter Store" >> /var/log/trinity-palette-setup.log
 
-# Automatically start the service (commented out - you may want to do this manually first)
-# systemctl start trinity-palette.service
+# Start the service automatically
+systemctl start trinity-palette.service
